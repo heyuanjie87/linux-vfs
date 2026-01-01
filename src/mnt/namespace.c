@@ -15,6 +15,8 @@ static LIST_HEAD(ex_mountpoints); /* protected by namespace_sem */
 static struct ns_hashtable mountpoint_hashtable = {};
 static struct ns_hashtable mount_hashtable = {};
 
+static DECLARE_RWSEM(namespace_sem);
+
 enum mnt_tree_flags_t
 {
     MNT_TREE_MOVE = BIT(0),
@@ -44,22 +46,22 @@ static inline struct hlist_head *m_hash(struct vfsmount *mnt, struct dentry *den
 
 static inline void lock_mount_hash(void)
 {
-    pr_todo();
+    write_seqlock(&mount_lock);
 }
 
 static inline void unlock_mount_hash(void)
 {
-    pr_todo();
+    write_sequnlock(&mount_lock);
 }
 
-static void namespace_lock(void)
+static inline void namespace_lock(void)
 {
-    pr_todo();
+    down_write(&namespace_sem);
 }
 
-static void namespace_unlock(void)
+static inline void namespace_unlock(void)
 {
-    pr_todo();
+    up_write(&namespace_sem);
 }
 
 static int mnt_alloc_id(struct mount *mnt)
