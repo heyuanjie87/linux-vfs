@@ -38,8 +38,6 @@ struct mountpoint
 
 #define MNT_NS_INTERNAL ERR_PTR(-EINVAL) /* distinct from any mnt_namespace */
 
-extern struct vfsmount *kern_mount(struct file_system_type *);
-
 static inline struct mount *real_mount(struct vfsmount *mnt)
 {
     return container_of(mnt, struct mount, mnt);
@@ -61,4 +59,4 @@ static inline int is_mounted(struct vfsmount *mnt)
     return !IS_ERR_OR_NULL(real_mount(mnt)->mnt_ns);
 }
 
-extern struct vfsmount *fc_mount(struct fs_context *fc);
+extern int fc_mount(struct fs_context *fc, struct vfsmount **mnt);

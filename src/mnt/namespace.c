@@ -64,30 +64,6 @@ static inline void namespace_unlock(void)
     up_write(&namespace_sem);
 }
 
-static int mnt_alloc_id(struct mount *mnt)
-{
-    pr_todo();
-    return 0;
-}
-
-static struct mount *alloc_vfsmnt(const char *name)
-{
-    struct mount *mnt = kzalloc(sizeof(struct mount), GFP_KERNEL);
-
-    if (mnt)
-    {
-        int err;
-
-        err = mnt_alloc_id(mnt);
-
-        INIT_LIST_HEAD(&mnt->mnt_mounts);
-        INIT_LIST_HEAD(&mnt->mnt_child);
-        INIT_LIST_HEAD(&mnt->mnt_instance);
-    }
-
-    return mnt;
-}
-
 struct mount *__lookup_mnt(struct vfsmount *mnt, struct dentry *dentry)
 {
     struct hlist_head *head = m_hash(mnt, dentry);
@@ -325,32 +301,6 @@ static void unlock_mount(struct mountpoint *where)
     inode_unlock(dentry->d_inode);
 }
 
-struct vfsmount *vfs_create_mount(struct fs_context *fc)
-{
-    struct mount *mnt;
-
-    if (!fc->root)
-        return ERR_PTR(-EINVAL);
-
-    mnt = alloc_vfsmnt(fc->source ?: "none");
-    if (!mnt)
-        return ERR_PTR(-ENOMEM);
-
-    if (fc->sb_flags & SB_KERNMOUNT)
-        mnt->mnt.mnt_flags = MNT_INTERNAL;
-
-    atomic_inc(&fc->root->d_sb->s_active);
-    mnt->mnt.mnt_sb = fc->root->d_sb;
-    mnt->mnt.mnt_root = dget(fc->root);
-    mnt->mnt_mountpoint = mnt->mnt.mnt_root;
-    mnt->mnt_parent = mnt;
-
-    lock_mount_hash();
-    list_add_tail(&mnt->mnt_instance, &mnt->mnt.mnt_sb->s_mounts);
-    unlock_mount_hash();
-    return &mnt->mnt;
-}
-
 static inline void mnt_add_count(struct mount *mnt, int n)
 {
     mnt->mnt_count += n;
@@ -469,9 +419,9 @@ static int do_new_mount_fc(struct fs_context *fc, struct path *mountpoint,
 
     up_write(&sb->s_umount);
 
-    mnt = vfs_create_mount(fc);
-    if (IS_ERR(mnt))
-        return PTR_ERR(mnt);
+    error = vfs_create_mount(fc, &mnt);
+    if (error)
+        return error;
 
     mp = lock_mount(mountpoint);
     if (IS_ERR(mp))
@@ -609,17 +559,6 @@ int path_mount(filedesc_t *fdp, const char *dev_name, struct path *path,
                        data_page);
 
     return ret;
-}
-
-struct vfsmount *fc_mount(struct fs_context *fc)
-{
-    int err = vfs_get_tree(fc);
-    if (!err)
-    {
-        up_write(&fc->root->d_sb->s_umount);
-        return vfs_create_mount(fc);
-    }
-    return ERR_PTR(err);
 }
 
 bool is_local_mountpoint(struct dentry *dentry)

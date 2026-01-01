@@ -31,7 +31,7 @@
 #include <uapi/linux/fs.h>
 #include <linux/fs_types.h>
 #include <linux/hlist.h>
-
+#include <linux/rwsem.h>
 #include <linux/pagemap.h>
 
 #include <linux/vfs/audit.h>
