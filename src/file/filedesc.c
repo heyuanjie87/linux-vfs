@@ -90,7 +90,12 @@ void filedesc_pwd_get(filedesc_t *fdp, filedesc_path_t *path)
     *path = fdp->pwd;
 }
 
-bool filedesc_isuser(filedesc_t *fdp)
+void filedesc_lock(filedesc_t *fdp)
 {
-    return fdp->is_user;
+
+}
+
+void filedesc_unlock(filedesc_t *fdp)
+{
+
 }
