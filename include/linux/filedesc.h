@@ -54,4 +54,5 @@ void *filedesc_file_get(filedesc_t *fdp, unsigned int fd, bool isclose);
 void filedesc_pwd_set(filedesc_t *fdp, filedesc_path_t root);
 void filedesc_pwd_get(filedesc_t *fdp, filedesc_path_t *root);
 
-bool filedesc_isuser(filedesc_t *fdp);
+void filedesc_lock(filedesc_t *fdp);
+void filedesc_unlock(filedesc_t *fdp);
