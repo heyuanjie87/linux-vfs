@@ -306,21 +306,6 @@ static inline void mnt_add_count(struct mount *mnt, int n)
     mnt->mnt_count += n;
 }
 
-/*
- * vfsmount lock must be held for write
- */
-void mnt_set_mountpoint(struct mount *mnt,
-			struct mountpoint *mp,
-			struct mount *child_mnt)
-{
-	mp->m_count++;
-	mnt_add_count(mnt, 1);	/* essentially, that's mntget */
-	child_mnt->mnt_mountpoint = mp->m_dentry;
-	child_mnt->mnt_parent = mnt;
-	child_mnt->mnt_mp = mp;
-	hlist_add_head(&child_mnt->mnt_mp_list, &mp->m_list);
-}
-
 static void __attach_mnt(struct mount *mnt, struct mount *parent)
 {
 	hlist_add_head_rcu(&mnt->mnt_hash,
