@@ -16,13 +16,6 @@ static inline struct hlist_bl_head *d_hash(unsigned int hash)
     return __d_hash(&_dcache, hash);
 }
 
-void dont_mount(struct dentry *dentry)
-{
-    d_lock(dentry);
-    dentry->d_flags |= DCACHE_CANT_MOUNT;
-    d_unlock(dentry);
-}
-
 /**
  * d_same_name - compare dentry name with case-exact name
  * @parent: parent dentry
