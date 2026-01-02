@@ -4,7 +4,7 @@ int fc_mount(struct fs_context *fc, struct vfsmount **mnt)
 {
     int err = vfs_get_tree(fc);
 
-    mnt = NULL;
+    *mnt = NULL;
     if (!err)
     {
         up_write(&fc->root->d_sb->s_umount);
