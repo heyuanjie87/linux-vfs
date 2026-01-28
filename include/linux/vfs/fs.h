@@ -9,7 +9,7 @@
 #include <linux/wait.h>
 #include <linux/kernel.h>
 #include <linux/rcupdate.h>
-#include <linux/stdlib.h>
+#include <linux/kmalloc.h>
 #include <linux/bug.h>
 #include <linux/spinlock.h>
 #include <linux/uaccess.h>
